@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CHESS JAVASCRIPT EDITION</title>
+</head>
+<body>
+<style>
+  .black
+  {
+    background-color: rgb(89, 232, 22);
+    height: 60px;
+    width: 60px;
+    color:rgb(84, 126, 65);
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .white
+  {
+    background-color: rgba(211, 255, 144, 0.482);
+    height: 60px;
+    width: 60px;
+    color:rgb(255, 0, 0);
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #chessboard
+  {
+    border: 5px solid rgb(230, 222, 8);
+  }
+  .previous
+  {
+    background-color: rgb(0, 0, 0);
+    height: 60px;
+    width: 60px;
+    border-radius: 30px;
+    color:rgb(200, 223, 0);
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .container
+  {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 17px;
+  }
+  body
+  {
+    background-image: linear-gradient(to bottom right, #9705f8, #f755ae);
+    border: 5px solid rgb(255, 0, 0);
+  }
+  
+  #won
+  {
+    display: grid;
+    margin: 45px;
+    font-size: 17px;
+  }
+
+  #whitewon
+  {
+    margin-bottom: 150px;
+    padding: 30px;
+    border-radius: 40px;
+  }
+
+  #blackwon
+  {
+    padding: 30px;
+    border-radius: 40px;
+    background-color: black;
+    color: white;
+  }
+  /*h1 
+  {
+      color: yellow;
+  }
+
+  #start 
+  {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  p
+  {
+    color: red;
+  }*/
+</style>
+
+
+<div class="container">
+  <table id="chessboard"></table>
+<div id="won">
+  <button id="whitewon" onclick="alert(`white has won`)">win</button>
+  <button id="blackwon" onclick="alert(`black has won`)">win</button>
+</div>
+</div>
+
+<script>
+  //107 47 47
+  
+  let count=1,cunt=0,possible=[],attacks=[],colors=[],colors2=[];
+  let coin="",obj=[],counter=0,arr,array;
+  var q=document.getElementById("chessboard");
+  let i,j,c=0;
+  var wp=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="30" viewBox="0 0 320 512"><path fill="#ffffff" d="M215.5 224c29.2-18.4 48.5-50.9 48.5-88c0-57.4-46.6-104-104-104S56 78.6 56 136c0 37.1 19.4 69.6 48.5 88H96c-17.7 0-32 14.3-32 32c0 16.5 12.5 30 28.5 31.8L80 400H240L227.5 287.8c16-1.8 28.5-15.3 28.5-31.8c0-17.7-14.3-32-32-32h-8.5zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H281.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L256 432H64L22.6 473.4z"></path></svg>`;
+
+  var wb=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="30" viewBox="0 0 320 512"><path fill="#ffffff" d="M128 0C110.3 0 96 14.3 96 32c0 16.1 11.9 29.4 27.4 31.7C78.4 106.8 8 190 8 288c0 47.4 30.8 72.3 56 84.7V400H256V372.7c25.2-12.5 56-37.4 56-84.7c0-37.3-10.2-72.4-25.3-104.1l-99.4 99.4c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6L270.8 154.6c-23.2-38.1-51.8-69.5-74.2-90.9C212.1 61.4 224 48.1 224 32c0-17.7-14.3-32-32-32H128zM48 432L6.6 473.4c-4.2 4.2-6.6 10-6.6 16C0 501.9 10.1 512 22.6 512H297.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L272 432H48z"></path></svg>`;
+
+  var wr=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="40" viewBox="0 0 448 512"><path fill="#ffffff" d="M32 192V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V88c0 4.4 3.6 8 8 8h32c4.4 0 8-3.6 8-8V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V88c0 4.4 3.6 8 8 8h32c4.4 0 8-3.6 8-8V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V192c0 10.1-4.7 19.6-12.8 25.6L352 256l16 144H80L96 256 44.8 217.6C36.7 211.6 32 202.1 32 192zm176 96h32c8.8 0 16-7.2 16-16V224c0-17.7-14.3-32-32-32s-32 14.3-32 32v48c0 8.8 7.2 16 16 16zM22.6 473.4L64 432H384l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H38.6C26.1 512 16 501.9 16 489.4c0-6 2.4-11.8 6.6-16z"></path></svg>`;
+
+  var wh=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="40" viewBox="0 0 448 512"><path fill="#ffffff" d="M96 48L82.7 61.3C70.7 73.3 64 89.5 64 106.5V238.9c0 10.7 5.3 20.7 14.2 26.6l10.6 7c14.3 9.6 32.7 10.7 48.1 3l3.2-1.6c2.6-1.3 5-2.8 7.3-4.5l49.4-37c6.6-5 15.7-5 22.3 0c10.2 7.7 9.9 23.1-.7 30.3L90.4 350C73.9 361.3 64 380 64 400H384l28.9-159c2.1-11.3 3.1-22.8 3.1-34.3V192C416 86 330 0 224 0H83.8C72.9 0 64 8.9 64 19.8c0 7.5 4.2 14.3 10.9 17.7L96 48zm24 68a20 20 0 1 1 40 0 20 20 0 1 1 -40 0zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H409.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L384 432H64L22.6 473.4z"></path></svg>`;
+
+  var wq=`<svg xmlns="http://www.w3.org/2000/svg" height="60" width="50" viewBox="0 0 512 512"><path fill="#ffffff" d="M256 0a56 56 0 1 1 0 112A56 56 0 1 1 256 0zM134.1 143.8c3.3-13 15-23.8 30.2-23.8c12.3 0 22.6 7.2 27.7 17c12 23.2 36.2 39 64 39s52-15.8 64-39c5.1-9.8 15.4-17 27.7-17c15.3 0 27 10.8 30.2 23.8c7 27.8 32.2 48.3 62.1 48.3c10.8 0 21-2.7 29.8-7.4c8.4-4.4 18.9-4.5 27.6 .9c13 8 17.1 25 9.2 38L399.7 400H384 343.6 168.4 128 112.3L5.4 223.6c-7.9-13-3.8-30 9.2-38c8.7-5.3 19.2-5.3 27.6-.9c8.9 4.7 19 7.4 29.8 7.4c29.9 0 55.1-20.5 62.1-48.3zM256 224l0 0 0 0h0zM112 432H400l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H86.6C74.1 512 64 501.9 64 489.4c0-6 2.4-11.8 6.6-16L112 432z"></path></svg>`;
+
+  var wk=`<svg xmlns="http://www.w3.org/2000/svg" height="60" width="40" viewBox="0 0 448 512"><path fill="#ffffff" d="M224 0c17.7 0 32 14.3 32 32V48h16c17.7 0 32 14.3 32 32s-14.3 32-32 32H256v48H408c22.1 0 40 17.9 40 40c0 5.3-1 10.5-3.1 15.4L368 400H80L3.1 215.4C1 210.5 0 205.3 0 200c0-22.1 17.9-40 40-40H192V112H176c-17.7 0-32-14.3-32-32s14.3-32 32-32h16V32c0-17.7 14.3-32 32-32zM38.6 473.4L80 432H368l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H54.6C42.1 512 32 501.9 32 489.4c0-6 2.4-11.8 6.6-16z"></path></svg>`;
+  
+  var bp=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="30" viewBox="0 0 320 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#000000" d="M215.5 224c29.2-18.4 48.5-50.9 48.5-88c0-57.4-46.6-104-104-104S56 78.6 56 136c0 37.1 19.4 69.6 48.5 88H96c-17.7 0-32 14.3-32 32c0 16.5 12.5 30 28.5 31.8L80 400H240L227.5 287.8c16-1.8 28.5-15.3 28.5-31.8c0-17.7-14.3-32-32-32h-8.5zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H281.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L256 432H64L22.6 473.4z"></path></svg>`;
+
+  var bb=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="30" viewBox="0 0 320 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#000000" d="M128 0C110.3 0 96 14.3 96 32c0 16.1 11.9 29.4 27.4 31.7C78.4 106.8 8 190 8 288c0 47.4 30.8 72.3 56 84.7V400H256V372.7c25.2-12.5 56-37.4 56-84.7c0-37.3-10.2-72.4-25.3-104.1l-99.4 99.4c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6L270.8 154.6c-23.2-38.1-51.8-69.5-74.2-90.9C212.1 61.4 224 48.1 224 32c0-17.7-14.3-32-32-32H128zM48 432L6.6 473.4c-4.2 4.2-6.6 10-6.6 16C0 501.9 10.1 512 22.6 512H297.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L272 432H48z"></path></svg>`;
+
+  var br=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="40" viewBox="0 0 448 512"><path fill="#000000" d="M32 192V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V88c0 4.4 3.6 8 8 8h32c4.4 0 8-3.6 8-8V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V88c0 4.4 3.6 8 8 8h32c4.4 0 8-3.6 8-8V48c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16V192c0 10.1-4.7 19.6-12.8 25.6L352 256l16 144H80L96 256 44.8 217.6C36.7 211.6 32 202.1 32 192zm176 96h32c8.8 0 16-7.2 16-16V224c0-17.7-14.3-32-32-32s-32 14.3-32 32v48c0 8.8 7.2 16 16 16zM22.6 473.4L64 432H384l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H38.6C26.1 512 16 501.9 16 489.4c0-6 2.4-11.8 6.6-16z"></path></svg>`;
+
+  var bh=`<svg xmlns="http://www.w3.org/2000/svg" height="56" width="40" viewBox="0 0 448 512"><path fill="#000000" d="M96 48L82.7 61.3C70.7 73.3 64 89.5 64 106.5V238.9c0 10.7 5.3 20.7 14.2 26.6l10.6 7c14.3 9.6 32.7 10.7 48.1 3l3.2-1.6c2.6-1.3 5-2.8 7.3-4.5l49.4-37c6.6-5 15.7-5 22.3 0c10.2 7.7 9.9 23.1-.7 30.3L90.4 350C73.9 361.3 64 380 64 400H384l28.9-159c2.1-11.3 3.1-22.8 3.1-34.3V192C416 86 330 0 224 0H83.8C72.9 0 64 8.9 64 19.8c0 7.5 4.2 14.3 10.9 17.7L96 48zm24 68a20 20 0 1 1 40 0 20 20 0 1 1 -40 0zM22.6 473.4c-4.2 4.2-6.6 10-6.6 16C16 501.9 26.1 512 38.6 512H409.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L384 432H64L22.6 473.4z"></path></svg>`;
+
+  var bq=`<svg xmlns="http://www.w3.org/2000/svg" height="60" width="50" viewBox="0 0 512 512"><path fill="#000000" d="M256 0a56 56 0 1 1 0 112A56 56 0 1 1 256 0zM134.1 143.8c3.3-13 15-23.8 30.2-23.8c12.3 0 22.6 7.2 27.7 17c12 23.2 36.2 39 64 39s52-15.8 64-39c5.1-9.8 15.4-17 27.7-17c15.3 0 27 10.8 30.2 23.8c7 27.8 32.2 48.3 62.1 48.3c10.8 0 21-2.7 29.8-7.4c8.4-4.4 18.9-4.5 27.6 .9c13 8 17.1 25 9.2 38L399.7 400H384 343.6 168.4 128 112.3L5.4 223.6c-7.9-13-3.8-30 9.2-38c8.7-5.3 19.2-5.3 27.6-.9c8.9 4.7 19 7.4 29.8 7.4c29.9 0 55.1-20.5 62.1-48.3zM256 224l0 0 0 0h0zM112 432H400l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H86.6C74.1 512 64 501.9 64 489.4c0-6 2.4-11.8 6.6-16L112 432z"></path></svg>`;
+
+  var bk=`<svg xmlns="http://www.w3.org/2000/svg" height="60" width="40" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#000000" d="M224 0c17.7 0 32 14.3 32 32V48h16c17.7 0 32 14.3 32 32s-14.3 32-32 32H256v48H408c22.1 0 40 17.9 40 40c0 5.3-1 10.5-3.1 15.4L368 400H80L3.1 215.4C1 210.5 0 205.3 0 200c0-22.1 17.9-40 40-40H192V112H176c-17.7 0-32-14.3-32-32s14.3-32 32-32h16V32c0-17.7 14.3-32 32-32zM38.6 473.4L80 432H368l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H54.6C42.1 512 32 501.9 32 489.4c0-6 2.4-11.8 6.6-16z"></path></svg>`;
+
+  let whites={pawn:wp,king:wk,queen:wq,horse:wh,bishop:wb,rook:wr};
+  let blacks={pawn:bp,king:bk,queen:bq,horse:bh,bishop:bb,rook:br};
+
+  //let white=["WP","WP","WP","WP","WP","WP","WP","WP","WK","WQ","WH","WH","WB","WB","WR","WR"];
+  //let black=["BP","BP","BP","BP","BP","BP","BP","BP","BK","BQ","BH","BH","BB","BB","BR","BR"];
+
+  //CREATING CHESSBOARD:
+
+  for(i=0;i<8;i++)
+  {
+    var x=q.insertRow(i);
+    for(j=0;j<8;j++)
+    {
+      var y=x.insertCell(j);
+      var button=document.createElement("button");
+      button.setAttribute("id",`${i}_${j}`);
+      y.appendChild(button);
+      y.setAttribute("id",`${i},${j}`);
+      if(c%2===0)
+      {
+        y.setAttribute("class","black");
+        button.setAttribute("class","black");
+      }
+      else
+      {
+        y.setAttribute("class","white");
+        button.setAttribute("class","white");
+      } 
+      c++;
+    }
+    c--;
+  }
+  for(i=0;i<8;i++)
+  {
+    q.rows[1].cells[i].getElementsByTagName("button")[0].innerHTML = whites.pawn;
+  }
+  for(i=0;i<8;i++)
+  {
+    q.rows[6].cells[i].getElementsByTagName("button")[0].innerHTML = blacks.pawn;
+  }
+  q.rows[0].cells[2].getElementsByTagName("button")[0].innerHTML = whites.bishop;
+  q.rows[0].cells[5].getElementsByTagName("button")[0].innerHTML = whites.bishop;
+  q.rows[0].cells[0].getElementsByTagName("button")[0].innerHTML = whites.rook;
+  q.rows[0].cells[7].getElementsByTagName("button")[0].innerHTML = whites.rook;
+  q.rows[0].cells[3].getElementsByTagName("button")[0].innerHTML = whites.queen;
+  q.rows[0].cells[4].getElementsByTagName("button")[0].innerHTML = whites.king;
+  q.rows[0].cells[1].getElementsByTagName("button")[0].innerHTML = whites.horse;
+  q.rows[0].cells[6].getElementsByTagName("button")[0].innerHTML = whites.horse;
+  q.rows[7].cells[4].getElementsByTagName("button")[0].innerHTML = blacks.king;
+  q.rows[7].cells[2].getElementsByTagName("button")[0].innerHTML = blacks.bishop;
+  q.rows[7].cells[5].getElementsByTagName("button")[0].innerHTML = blacks.bishop;
+  q.rows[7].cells[0].getElementsByTagName("button")[0].innerHTML = blacks.rook;
+  q.rows[7].cells[7].getElementsByTagName("button")[0].innerHTML = blacks.rook;
+  q.rows[7].cells[3].getElementsByTagName("button")[0].innerHTML = blacks.queen;
+  q.rows[7].cells[1].getElementsByTagName("button")[0].innerHTML = blacks.horse;
+  q.rows[7].cells[6].getElementsByTagName("button")[0].innerHTML = blacks.horse;
+  //tried creating simple coin movement func 
+  
+  /*function coin()
+  {
+    count++;
+    if(count%2!==0)
+    {
+      coin1=this.innerHTML;
+      coin2=this;
+    } 
+    else
+    {
+      this.innerHTML=coin1;
+      coin2.innerHTML="";
+      coin1="";
+      
+    }
+  }*/
+
+  // coin movement function
+  
+  function move()
+  {
+    count++;
+    if(count%2!==0)
+    {
+      coin=this;
+    } 
+    else
+    {
+      this.innerHTML=coin.innerHTML;
+      coin.innerHTML="";
+    }
+  }
+  //complete movement function for each piece comes under play().
+  /*function play()
+  {
+    
+    
+    count++;
+    if(count%2!==0)
+    {
+      //copy the button into coin
+      coin=this;
+      if(coin.innerHTML===whites.pawn)
+      {
+        white_pawn.call(this);
+      }
+      else if(coin.innerHTML===blacks.pawn)
+      {
+        black_pawn.call(this);
+      }
+      else if(coin.innerHTML===whites.bishop)
+      {
+        white_bishop.call(this);
+      }
+      else if(coin.innerHTML===whites.rook)
+      {
+        white_rook.call(this);
+      }
+      else if(coin.innerHTML===whites.queen)
+      {
+        white_queen.call(this);
+      }
+    }
+    else
+    {
+      //if the copied button's text is white pawn do the following upon clicking next button
+      this.innerHTML=coin.innerHTML;
+      coin.innerHTML="";
+      for(i in possible)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        possible[i].style.backgroundColor="";
+      }
+      for(i in attacks)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        attacks[i].style.backgroundColor="";
+      }
+      attacks.splice(0,attacks.length);
+      possible.splice(0,possible.length);
+      /*for(i=0;i<8;i++)
+      {
+        if(this.id===`${7}_${i}`)
+        {
+          this.innerHTML=whites.queen;
+          coin.innerHTML="";
+        }
+      }
+    }
+  }*/
+function check()
+{
+  if(this.innerHTML===whites.pawn)
+  {
+    white_pawn.call(this);
+    count=0;
+  }
+  if(this.innerHTML===whites.bishop)
+  {
+    white_bishop.call(this);
+    count=0;
+  }
+  else if(this.innerHTML===whites.rook)
+  {
+    white_rook.call(this);
+    count=0;
+  }
+  else if(this.innerHTML===whites.queen)
+  {
+    white_queen.call(this);
+    count=0;
+  }
+  else if(this.innerHTML===whites.king)
+  {
+    white_king.call(this);
+    count=0;
+  }
+  else if(this.innerHTML===whites.horse)
+  {
+    white_horse.call(this);
+    count=0;
+  }
+  for(i in attacks)
+  {
+    if(attacks[i].innerHTML.includes(blacks.king))
+    {
+      let p=attacks[i];
+      obj.push(p);
+      delete attacks[i];
+      
+      obj[0].style.backgroundColor="purple";
+    }
+  }
+  for(i in possible)
+  {
+    //this makes the background color go back to wut's mentioned in css
+    possible[i].style.backgroundColor="";
+  }
+  for(i in attacks)
+  {
+    //this makes the background color go back to wut's mentioned in css
+    attacks[i].style.backgroundColor="";
+  }
+  
+  possible=[];
+  attacks=[];
+  
+}
+
+function bcheck()
+{
+  for(i=0;i<8;i++)
+  {
+    
+    for(j=0;j<8;j++)
+    {
+      array=document.getElementById(`${i}_${j}`);
+      console.log(array);
+      if(array.innerHTML===whites.pawn)
+      {
+        white_pawn.call(this);
+        count=0;
+      }
+      if(array.innerHTML===whites.bishop)
+      {
+        white_bishop.call(this);
+        count=0;
+      }
+      else if(array.innerHTML===whites.rook)
+      {
+        white_rook.call(this);
+        count=0;
+      }
+      else if(array.innerHTML===whites.queen)
+      {
+        white_queen.call(this);
+        count=0;
+      }
+      else if(array.innerHTML===whites.king)
+      {
+        white_king.call(this);
+        count=0;
+      }
+      else if(array.innerHTML===whites.horse)
+      {
+        white_horse.call(this);
+        count=0;
+      }
+    }
+  }
+  for(i in attacks)
+  {
+    if(attacks[i].innerHTML===blacks.king)
+    {
+      attacks[i].style.backgroundColor="purple";
+      console.log(attacks[i]);
+      counter=1;
+    }
+  }
+  for(i in possible)
+  {
+    if(possible[i].innerHTML===blacks.king)
+    {
+      possible[i].style.backgroundColor="purple";
+      console.log(possible[i]);
+      counter=1;
+    }
+  }
+}
+
+
+  /*for(i in attacks)
+  {
+    if(attacks[i].innerHTML.includes(blacks.king))
+    {
+      let p=attacks[i];
+      obj.push(p);
+      delete attacks[i];
+      console.log(attacks[i]);
+      obj[0].style.backgroundColor="purple";
+    }
+  }
+  for(i in possible)
+  {
+    //this makes the background color go back to wut's mentioned in css
+    possible[i].style.backgroundColor="";
+  }
+  for(i in attacks)
+  {
+    //this makes the background color go back to wut's mentioned in css
+    attacks[i].style.backgroundColor="";
+  }
+  possible.slice(0,possible.length);
+  attacks.slice(0,attacks.length);
+*/
+
+function turn()
+{
+  if(counter===0)
+  {
+    whites_turn.call(this);
+    
+  }
+  if(counter===1)
+  {
+    
+    blacks_turn.call(this);
+  }
+}
+function whites_turn()
+{
+  
+  if(this.innerHTML.includes("#ffffff"))
+  {
+    coin=this;
+    
+    if((possible.length!==0 || attacks.length!==0) )
+    {
+      for(i in possible)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        possible[i].style.backgroundColor="";
+      }
+      for(i in attacks)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        attacks[i].style.backgroundColor="";
+      }
+      attacks.splice(0,attacks.length);
+      possible.splice(0,possible.length);
+      
+    }
+    if(coin.innerHTML===whites.pawn)
+    {
+      white_pawn.call(this);
+      count=0;
+    }
+    if(coin.innerHTML===whites.bishop)
+    {
+      white_bishop.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===whites.rook)
+    {
+      white_rook.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===whites.queen)
+    {
+      white_queen.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===whites.king)
+    {
+      white_king.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===whites.horse)
+    {
+      white_horse.call(this);
+      count=0;
+    }
+    
+  }
+  if(this.innerHTML==="" || this.innerHTML.includes("#000000"))
+  {
+    
+    for(j in possible)
+    {
+      if(this===possible[j])
+      {
+        this.innerHTML=coin.innerHTML;
+        
+        coin.innerHTML="";
+        arr=this;
+        
+        for(i in possible)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          possible[i].style.backgroundColor="";
+        }
+        for(i in attacks)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          attacks[i].style.backgroundColor="";
+        }
+        attacks.splice(0,attacks.length);
+        possible.splice(0,possible.length);
+        
+        check.call(this);
+        
+        count=1;
+        counter=1;
+      }
+    }
+    for(j in attacks)
+    {
+      if(this===attacks[j])
+      {
+        this.innerHTML=coin.innerHTML;
+        coin.innerHTML="";
+        for(i in possible)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          possible[i].style.backgroundColor="";
+          
+        }
+        for(i in attacks)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          attacks[i].style.backgroundColor="";
+        }
+        attacks.splice(0,attacks.length);
+        possible.splice(0,possible.length);
+        
+        count=1;
+        counter=1;
+      }
+    }
+    
+    
+  }
+}
+function blacks_turn()
+{
+  if(this.innerHTML.includes("#000000") || obj.length!==0)
+  {
+    
+    coin=this;
+    if((possible.length!==0 || attacks.length!==0) )
+    {
+      for(i in possible)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        possible[i].style.backgroundColor="";
+      }
+      for(i in attacks)
+      {
+        //this makes the background color go back to wut's mentioned in css
+        attacks[i].style.backgroundColor="";
+      }
+      attacks.splice(0,attacks.length);
+      possible.splice(0,possible.length);
+    }
+    if(coin.innerHTML===blacks.pawn)
+    {
+      black_pawn.call(this);
+      count=0;
+    }
+    if(coin.innerHTML===blacks.bishop)
+    {
+      black_bishop.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===blacks.rook)
+    {
+      black_rook.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===blacks.queen)
+    {
+      black_queen.call(this);
+      count=0;
+    }
+    else if(coin.innerHTML===blacks.king)
+    {
+      black_king.call(this);
+      if(obj.length!=0)
+        {
+            obj[0].style.backgroundColor="";
+            obj=[];
+        }
+      count=0;
+    }
+    else if(coin.innerHTML===blacks.horse)
+    {
+      black_horse.call(this);
+      count=0;
+    }
+  }
+  if(this.innerHTML==="" || this.innerHTML.includes("#ffffff"))
+  {
+    for(j in possible)
+    {
+      if(this===possible[j])
+      {
+        this.innerHTML=coin.innerHTML;
+        coin.innerHTML="";
+        arr=this;
+        for(i in possible)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          possible[i].style.backgroundColor="";
+        }
+        for(i in attacks)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          attacks[i].style.backgroundColor="";
+        }
+        attacks.splice(0,attacks.length);
+        possible.splice(0,possible.length);
+        
+        count++;
+        counter=0;
+        
+      }
+    }
+    for(j in attacks)
+    {
+      if(this===attacks[j])
+      {
+        this.innerHTML=coin.innerHTML;
+        coin.innerHTML="";
+        
+        for(i in possible)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          possible[i].style.backgroundColor="";
+        }
+        for(i in attacks)
+        {
+          //this makes the background color go back to wut's mentioned in css
+          attacks[i].style.backgroundColor="";
+        }
+        attacks.splice(0,attacks.length);
+        possible.splice(0,possible.length);
+        count++;
+        counter=0;
+        
+      }
+    }
+  }
+}
+
+
+
+  // giving the functions to each button upon clicking
+
+  for(i=0;i<8;i++)
+  {
+    for(j=0;j<8;j++)
+    {
+      q.rows[i].cells[j].getElementsByTagName("button")[0].addEventListener("click",turn);
+    }
+  }
+/*
+  function play()
+  {
+    if(count%2!==0)
+      {
+        //copy the button into coin
+        coin=this;
+        if(coin.innerHTML===whites.pawn)
+        {
+          white_pawn.call(this);
+        }
+        else if(coin.innerHTML===whites.bishop)
+        {
+          white_bishop.call(this);
+        }
+        else if(coin.innerHTML===whites.rook)
+        {
+          white_rook.call(this);
+        }
+        else if(coin.innerHTML===whites.queen)
+        {
+          white_queen.call(this);
+        }
+        else if(coin.innerHTML===whites.king)
+        {
+          white_king.call(this);
+        }
+        else if(coin.innerHTML===whites.horse)
+        {
+          white_horse.call(this);
+        }
+        else if(coin.innerHTML===blacks.pawn)
+        {
+          black_pawn.call(this);
+        }
+        else if(coin.innerHTML===blacks.bishop)
+        {
+          black_bishop.call(this);
+        }
+        else if(coin.innerHTML===blacks.rook)
+        {
+          black_rook.call(this);
+        }
+        else if(coin.innerHTML===blacks.queen)
+        {
+          black_queen.call(this);
+        }
+        else if(coin.innerHTML===blacks.king)
+        {
+          black_king.call(this);
+        }
+        else if(coin.innerHTML===blacks.horse)
+        {
+          black_horse.call(this);
+        }
+        count++;
+        console.log(count);
+      }
+      else
+      {
+        //if the copied button's text is white pawn do the following upon clicking next button
+        for(j in possible)
+        {
+          if(this===possible[j])
+          {
+            console.log("hi");
+            this.innerHTML=coin.innerHTML;
+            coin.innerHTML="";
+            for(i in possible)
+            {
+              //this makes the background color go back to wut's mentioned in css
+              possible[i].style.backgroundColor="";
+            }
+            for(i in attacks)
+            {
+              //this makes the background color go back to wut's mentioned in css
+              attacks[i].style.backgroundColor="";
+            }
+            attacks.splice(0,attacks.length);
+            possible.splice(0,possible.length);
+            count++;
+          }
+        }
+        for(j in attacks)
+        {
+          if(this===attacks[j])
+          {
+            this.innerHTML=coin.innerHTML;
+            coin.innerHTML="";
+            for(i in possible)
+            {
+              //this makes the background color go back to wut's mentioned in css
+              possible[i].style.backgroundColor="";
+            }
+            for(i in attacks)
+            {
+              //this makes the background color go back to wut's mentioned in css
+              attacks[i].style.backgroundColor="";
+            }
+            attacks.splice(0,attacks.length);
+            possible.splice(0,possible.length);
+            count++;
+          }
+        }
+        if(possible.length===0 && attacks.length===0)
+        {
+          count--;
+        }
+        /*for(i=0;i<8;i++)
+        {
+          if(this.id===`${7}_${i}`)
+          {
+            this.innerHTML=whites.queen;
+            coin.innerHTML="";
+          }
+        }
+      }
+  }
+*/
+
+//function to highlight possible moves of white pawn.
+
+function white_pawn()
+{
+  
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  
+  if(document.getElementById(`${m+1}_${n}`).innerHTML==="")
+  {
+    possible.push(document.getElementById(`${m+1}_${n}`));
+    if(m===1)
+    {
+      if(document.getElementById(`${m+2}_${n}`).innerHTML==="")
+      {
+        possible.push(document.getElementById(`${m+2}_${n}`));
+      }
+      
+    }
+
+  }
+
+  if(n===7 && document.getElementById(`${m+1}_${6}`).innerHTML.includes("#000000"))
+  {
+    attacks.push(document.getElementById(`${m+1}_${6}`));
+  }
+
+  else if(n===0 && document.getElementById(`${m+1}_${1}`).innerHTML.includes("#000000"))
+  {
+    attacks.push(document.getElementById(`${m+1}_${1}`));
+  }
+
+  if(n!==7 && n!==0 && document.getElementById(`${m+1}_${n+1}`).innerHTML.includes("#000000"))
+  {
+    attacks.push(document.getElementById(`${m+1}_${n+1}`));
+  }
+  if(n!==7 && n!==0 && document.getElementById(`${m+1}_${n-1}`).innerHTML.includes("#000000"))
+  {
+    attacks.push(document.getElementById(`${m+1}_${n-1}`));
+  }
+  for(i in possible)
+  {
+    possible[i].style.backgroundColor="blue";
+  }
+  for(i in attacks)
+  {
+    attacks[i].style.backgroundColor="red";
+  }
+  
+  
+  
+}
+
+//function to highlight possible moves of black pawn.
+
+function black_pawn()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  
+  if(document.getElementById(`${m-1}_${n}`).innerHTML==="")
+  {
+    possible.push(document.getElementById(`${m-1}_${n}`));
+    if(m===6)
+    {
+      if(document.getElementById(`${m-2}_${n}`).innerHTML==="")
+      {
+        possible.push(document.getElementById(`${m-2}_${n}`));
+      }
+      
+    }
+  }
+  if(n===7 && document.getElementById(`${m-1}_${6}`).innerHTML.includes("#ffffff"))
+  {
+    attacks.push(document.getElementById(`${m-1}_${6}`));
+  }
+  else if(n===0 && document.getElementById(`${m-1}_${1}`).innerHTML.includes("#ffffff"))
+  {
+    attacks.push(document.getElementById(`${m-1}_${1}`));
+  }
+  if(n!==7 && n!==0 && document.getElementById(`${m-1}_${n+1}`).innerHTML.includes("#ffffff"))
+  {
+    attacks.push(document.getElementById(`${m-1}_${n+1}`));
+  }
+  if(n!==7 && n!==0 && document.getElementById(`${m-1}_${n-1}`).innerHTML.includes("#ffffff"))
+  {
+    attacks.push(document.getElementById(`${m-1}_${n-1}`));
+  }
+  for(i in possible)
+  {
+    possible[i].style.backgroundColor="blue";
+  }
+  for(i in attacks)
+  {
+    attacks[i].style.backgroundColor="red";
+  }
+}
+
+function white_bishop()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  let i=1;
+  let c=0;
+  while((m-i)>=0 && (n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n-i}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n-i}`));
+          c=1
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m-i)>=0 && (n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n+i}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n+i}`));
+          c=1
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && (n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n+i}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m+i}_${n+i}`));
+          c=1;
+      }
+      else
+      {
+        c=1;
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && (n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n-i}`).innerHTML.includes("#000000"))
+        {
+            attacks.push(document.getElementById(`${m+i}_${n-i}`));
+            c=1;
+        }
+        else
+        {
+          c=1;  
+        }
+    }
+    
+    i++;
+  }
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+  i=1;
+  c=0;
+}
+
+function white_rook()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  let i=1;
+  let c=0;
+  while((m-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n}`));
+          c=1
+          
+      }
+      else
+      {
+        c=1;  
+        
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n}`).innerHTML.includes("#000000"))
+        {
+            attacks.push(document.getElementById(`${m+i}_${n}`));
+            c=1
+            
+        }
+        else
+        {
+          c=1;  
+          
+        }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m}_${n-i}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m}_${n-i}`));
+          c=1
+          
+      }
+      else
+      {
+        c=1;  
+        
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m}_${n+i}`).innerHTML.includes("#000000"))
+      {
+          attacks.push(document.getElementById(`${m}_${n+i}`));
+          c=1;
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+
+function white_queen()
+{
+  white_bishop.call(this);
+  white_rook.call(this);
+}
+
+function white_king()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  console.log("hi");
+  for(i=-1;i<2;i++)
+  {
+    for(j=-1;j<2;j++)
+    {
+      if((m+i)>=0 && m+i<=7 && n+j<=7 && (n+j)>=0)
+      {
+        if(i===0 && j===0)
+        {
+          continue;
+        }
+        else if(document.getElementById(`${m+i}_${n+j}`).innerHTML==="")
+        {
+          console.log("possible");
+          possible.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+        else if(document.getElementById(`${m+i}_${n+j}`).innerHTML !== "")
+        {
+          if(document.getElementById(`${m+i}_${n+j}`).innerHTML.includes("#000000"))
+          {
+            console.log("attacks");
+            attacks.push(document.getElementById(`${m+i}_${n+j}`));
+          }
+        }
+      }
+    }
+  }
+
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+
+function white_horse()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  console.log(m,n);
+  for(i=-2;i<3;i++)
+  {
+    for(j=-2;j<3;j++)
+    {
+      if(i!=j && i!=0 && j!=0 && i != -j && m+i<=7 && m+i>=0  && n+j<=7 && n+j>=0)
+      {
+        if(document.getElementById(`${m+i}_${n+j}`).innerHTML==="")
+        {
+          possible.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+        else if(document.getElementById(`${m+i}_${n+j}`).innerHTML.includes("#000000"))
+        {
+          attacks.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+      }
+    }
+  }
+
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+
+function black_bishop()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  let i=1;
+  let c=0;
+  while((m-i)>=0 && (n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n-i}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n-i}`));
+          c=1;
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m-i)>=0 && (n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n+i}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n+i}`));
+          c=1
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && (n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n+i}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m+i}_${n+i}`));
+          c=1;
+      }
+      else
+      {
+        c=1;
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && (n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n-i}`).innerHTML.includes("#ffffff"))
+        {
+            attacks.push(document.getElementById(`${m+i}_${n-i}`));
+            c=1;
+        }
+        else
+        {
+          c=1;  
+        }
+    }
+    
+    i++;
+  }
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+  i=1;
+  c=0;
+}
+
+function black_rook()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  let itr;
+  let i=1;
+  let c=0;
+  while((m-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m-i}_${n}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m-i}_${n}`));
+    }  
+    else if(document.getElementById(`${m-i}_${n}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m-i}_${n}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m-i}_${n}`));
+          c=1
+          
+      }
+      else
+      {
+        c=1;  
+        
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((m+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m+i}_${n}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m+i}_${n}`));
+    }  
+    else if(document.getElementById(`${m+i}_${n}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m+i}_${n}`).innerHTML.includes("#ffffff"))
+        {
+            attacks.push(document.getElementById(`${m+i}_${n}`));
+            c=1
+            
+        }
+        else
+        {
+          c=1;  
+          
+        }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((n-i)>=0 && c===0)
+  {
+    if(document.getElementById(`${m}_${n-i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m}_${n-i}`));
+    }  
+    else if(document.getElementById(`${m}_${n-i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m}_${n-i}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m}_${n-i}`));
+          c=1
+          
+      }
+      else
+      {
+        c=1;  
+        
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  while((n+i)<=7 && c===0)
+  {
+    if(document.getElementById(`${m}_${n+i}`).innerHTML==="")
+    {
+      possible.push(document.getElementById(`${m}_${n+i}`));
+    }  
+    else if(document.getElementById(`${m}_${n+i}`).innerHTML!=="")
+    {
+      if(document.getElementById(`${m}_${n+i}`).innerHTML.includes("#ffffff"))
+      {
+          attacks.push(document.getElementById(`${m}_${n+i}`));
+          c=1;
+      }
+      else
+      {
+        c=1;  
+      }
+    }
+    i++;
+  }
+  i=1;
+  c=0;
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+
+function black_queen()
+{
+  black_bishop.call(this);
+  black_rook.call(this);
+}
+
+function black_king()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  for(i=-1;i<2;i++)
+  {
+    for(j=-1;j<2;j++)
+    {
+      if((m+i)>=0 && m+i<=7 && n+j<=7 && (n+j)>=0)
+      {
+        if(i===0 && j===0)
+      {
+        continue;
+      }
+      else if(document.getElementById(`${m+i}_${n+j}`).innerHTML==="")
+      {
+        possible.push(document.getElementById(`${m+i}_${n+j}`));
+      }
+      else if(document.getElementById(`${m+i}_${n+j}`).innerHTML !== "")
+      {
+        if(document.getElementById(`${m+i}_${n+j}`).innerHTML.includes("#ffffff"))
+        {
+          attacks.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+      }
+      }
+    }
+  }
+
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+
+function black_horse()
+{
+  let str=this.id;
+  let m=Number(str[0]);
+  let n=Number(str[2]);
+  for(i=-2;i<3;i++)
+  {
+    for(j=-2;j<3;j++)
+    {
+      if(i!=j && i!=0 && j!=0 && i != -j && m+i<=7 && m+i>=0  && n+j<=7 && n+j>=0)
+      {
+        if(document.getElementById(`${m+i}_${n+j}`).innerHTML==="")
+        {
+          possible.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+        else if(document.getElementById(`${m+i}_${n+j}`).innerHTML.includes("#ffffff"))
+        {
+          attacks.push(document.getElementById(`${m+i}_${n+j}`));
+        }
+      }
+    }
+  }
+
+  for(j in possible)
+  {
+    possible[j].style.backgroundColor="blue";
+  }
+  for(j in attacks)
+  {
+    attacks[j].style.backgroundColor="red";
+  }
+}
+</script>
+
+</body>
+
+</html>
